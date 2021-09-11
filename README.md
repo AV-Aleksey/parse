@@ -11,3 +11,5 @@ source env/bin/activate активация виртуальной среды
 python3 -m venv shop имя например shop при создании
 
 env/bin/python -m pip freeze > requirements.txt - обновление зависимостей
+
+pip -V - Проверка среды
