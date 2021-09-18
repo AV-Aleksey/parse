@@ -1,11 +1,18 @@
-def get_body_cards(soup, logs=False):
-    all_cards = soup.find_all(class_="g")
-    result = []
+from helpers import findPhone
 
+# Метод для парсинга карточек из центральной части страницы выдачи
+
+
+def get_body_cards(soup, logs=False):
+    result = []
     err_count = 0
 
+    all_cards = soup.find_all(class_="g")
+
     for card in all_cards:
-        payload = {}
+        payload = {
+            "phone": []
+        }
 
         urls = card.find_all(class_="tjvcx")
         descriptions = card.find_all(class_="lEBKkf")
@@ -18,6 +25,7 @@ def get_body_cards(soup, logs=False):
 
         try:
             payload["descriptions"] = descriptions[0].contents[0].text
+            payload["phone"] = findPhone(descriptions[0].contents[0].text)
         except:
             payload["descriptions"] = 'не удалось получить данные'
             err_count += 1
@@ -25,7 +33,7 @@ def get_body_cards(soup, logs=False):
         result.append(payload)
 
     if logs:
-        print('--  --  --')
+        print('--  Карточки  --')
         print("Количество найденных узлов в DOM:", len(all_cards))
         print("Количество спаршеных: ", len(result))
         print("Количество спаршеных с ошибками: ", err_count)
@@ -34,15 +42,18 @@ def get_body_cards(soup, logs=False):
     return result
 
 
+# Метод для парсинга карточек из рекламной части страницы выдачи
 def get_advertising_cards(soup, logs=False):
-    all_cards = soup.find_all(class_="uEierd")
     result = []
-
     err_count = 0
 
-    for card in all_cards:
+    all_cards = soup.find_all(class_="uEierd")
 
-        payload = {}
+    for card in all_cards:
+        payload = {
+            "phone": []
+        }
+
         urls = card.find_all(class_="qzEoUe")
         descriptions = card.find_all(class_="lyLwlc")
         phone = card.find_all(class_="WZ8Tjf")
@@ -55,20 +66,20 @@ def get_advertising_cards(soup, logs=False):
 
         try:
             payload["descriptions"] = descriptions[0].contents[0].text
+            payload["phone"] = findPhone(descriptions[0].contents[0].text)
         except:
             payload["descriptions"] = None
             err_count += 1
 
         try:
-            payload["phone"] = phone[0].text
+            payload["phone"].append(phone[0].text)
         except:
-            payload["phone"] = None
             err_count += 1
 
         result.append(payload)
 
     if logs:
-        print('--  --  --')
+        print('--  Карточки рекламы  --')
         print("Количество найденных узлов в DOM:", len(all_cards))
         print("Количество спаршеных: ", len(result))
         print("Количество спаршеных с ошибками: ", err_count)
