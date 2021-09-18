@@ -1,21 +1,20 @@
-import requests
 import json
-from bs4 import BeautifulSoup
-
-from helpers import headers
+from helpers import connectPage
 from parser_methods import *
 
 
+# Основная ф-ия дял парсинга google
 def parser_google(pages_limit=100, createJson=False):
     currentIdx = 10
     result = []
 
     while currentIdx <= pages_limit:
-        url = f'https://www.google.com/search?q=разработка+сайтов+москва&start={str(currentIdx)}'
+        soup = connectPage(
+            f'https://www.google.com/search?q=разработка+сайтов+москва&start={str(currentIdx)}')
 
-        print(url)
-        req = requests.get(url, headers=headers).text
-        soup = BeautifulSoup(req, "lxml")
+        if soup == None:
+            currentIdx += 10
+            continue
 
         advertising_cards = get_advertising_cards(soup, True)
         body_cards = get_body_cards(soup, True)
